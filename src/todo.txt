@@ -1,0 +1,71 @@
+# needed for minimal KKR run
+ 
+ phase shifts and t-matrix
+   .. inclusion of MT-radius variable
+   .. boundary conditions for Z and J
+   .. make fitting of f(x) for RK4 efficient
+   
+  inversion for tau = (t^-1 - G0)^-1
+   .. call LAPACK for LU factorization
+   .. call LAPACK for inversion on LU
+   .. extract diagonal tau00 from result
+
+  Greens function G = Z tau00 Z - Z J
+   .. calculate int(Z Z), int(Z J)
+   .. LAPACK calls to matrix multiplaction
+   .. get charge density from -1/pi Im(.)
+
+  core solver for MT-case
+   .. correct determination of matching point
+   .. how to treat semi-core with leaking charge?
+
+  calculation of muffin-tin zero
+   .. assume v0 = 0 (i.e. non-variational)??
+
+  poisson solver 
+   .. integrate inward from v0 = 0??
+  
+  contour integration
+   .. get DoS = -1/pi Im int(G(E,r) dr)
+   .. calculate gauss points & weights on semi-circle
+
+  integration over k-space
+   .. create D operators from spherical harmonics
+
+  total energy
+   .. calculate Madelung matrix
+   .. calculate Coloumb term
+   .. sum core energies and valence bands
+
+
+for( E = emin, emax, deltae ) {
+
+  real N = crystal.lloydN(E);
+}
+
+crystal.lloydN(cplx E) {
+
+  static cplx cached_phase[kkrsz];
+
+  for(int l = 0; l < maxl; l++) {
+    dl = atom.phase_shift(E,l);
+    tl = -p*sin(dl)*exp(im*dl);
+  }
+  
+  cplx lloyd = 0.0;
+  for(int k = 0; k < numk; k++) {
+
+    green0.gmat(&gmat, E, k); n = 0;
+    for(int l = 0; l <= maxl; l++)
+    for(int m = -l; m <= l; m++)
+      { gmat[n][n] += 1.0/tl; n++; }
+
+    lu_factorize(gmat);
+    for(int n = 0; n < kkrsz; n++)
+      lloyd += correct_phase_branch( log(gmat[n][n]), cached_phase[n] ) * weight[k];
+  }
+
+
+  lloyd /= -pi;
+  return lloyd.imag();
+}

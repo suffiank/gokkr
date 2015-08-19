@@ -1,0 +1,9 @@
+**/.DS_Store
+src/atom/bin/
+src/atom/obj/
+src/crystal/bin/
+src/crystal/obj/
+src/green0/bin/
+src/green0/obj/
+src/util/obj/
+bin/

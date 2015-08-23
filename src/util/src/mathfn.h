@@ -29,6 +29,8 @@ struct interval_t {
 
 // constants 
 const dble pi = M_PI;
+const dble tpi = 2.0*M_PI;
+const dble fpi = 4.0*M_PI;
 const cplx im = cplx(0.0,1.0);
 
 // fitting

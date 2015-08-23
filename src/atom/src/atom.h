@@ -2,6 +2,8 @@
 #define _ATOM_H_
 
 #include <vector>
+#include <map>
+#include <string>
 #include "../../util/src/mathfn.h"
 
 struct orbital_t {
@@ -25,6 +27,13 @@ struct atom_t {
 
   int nlvl;
   std::vector<orbital_t> orbital;
+
+  bool verbose;
+
+  // common interface
+  atom_t() : verbose(false) {}
+  atom_t(std::map<std::string,std::string>& kvp) { configure(kvp); }
+  void configure(std::map<std::string,std::string>& kvp);
 
   // methods
   void set_logarithmic_grid(int N, dble rmin, dble rmax);

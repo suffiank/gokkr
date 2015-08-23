@@ -68,17 +68,17 @@ void extract_lattvec(map<string,string>& kvp, mat3& avec) {
     extractkvp(kvp, "crystal.lattice.x", avec[0].x, require_key_dbl);
     extractkvp(kvp, "crystal.lattice.y", avec[0].y, require_key_dbl);
     extractkvp(kvp, "crystal.lattice.z", avec[0].z, require_key_dbl);
-    avec[0] = tpi*avec[0];
+    // avec[0] = tpi*avec[0];
   
     extractkvp(kvp, "crystal.lattice.x2", avec[1].x, require_key_dbl);
     extractkvp(kvp, "crystal.lattice.y2", avec[1].y, require_key_dbl);
     extractkvp(kvp, "crystal.lattice.z2", avec[1].z, require_key_dbl);
-    avec[1] = tpi*avec[1];
+    // avec[1] = tpi*avec[1];
   
     extractkvp(kvp, "crystal.lattice.x3", avec[2].x, require_key_dbl);
     extractkvp(kvp, "crystal.lattice.y3", avec[2].y, require_key_dbl);
     extractkvp(kvp, "crystal.lattice.z3", avec[2].z, require_key_dbl);
-    avec[2] = tpi*avec[2];
+    // avec[2] = tpi*avec[2];
   }
   catch(string msgin) {
     throw string("error: unable to read Bravais vectors\n"+msgin);
@@ -156,7 +156,7 @@ void extract_basis(map<string,string>& kvp, vector<vec3>& basis) {
       extractkvp(kvp, header+ax+cnt, basis[n].x, require_key_dbl);
       extractkvp(kvp, header+ay+cnt, basis[n].y, require_key_dbl);
       extractkvp(kvp, header+az+cnt, basis[n].z, require_key_dbl);
-      basis[n] = tpi*basis[n];
+      // basis[n] = tpi*basis[n];
     }
     catch(string msgin) {
       throw string("error: unable to read basis sites\n"+msgin);

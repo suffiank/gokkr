@@ -7,7 +7,7 @@
 #include <limits>
 #include "mat3.h"
 
-const int require_key_dbl = std::numeric_limits<double>::max();
+const double require_key_dbl = std::numeric_limits<double>::max();
 const int require_key_int = std::numeric_limits<int>::max();
 
 void extractkvp(std::map<std::string,std::string>& kvp, 

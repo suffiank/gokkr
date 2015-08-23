@@ -1,11 +1,30 @@
 #include "atom.h"
 #include "eqsolver.h"
+#include "../../util/src/extractkvp.h"
 #include <cstdio>
 #include <algorithm>
 using namespace std;
 
 dble sign(dble val) {
   return (0.0 < val) - (val < 0.0);
+}
+
+void atom_t::configure(std::map<std::string,std::string>& kvp) {
+
+  extractkvp(kvp, "Z", Z, 1);
+
+  int ngrid;
+  double rmin, rmax;
+  extractkvp(kvp, "N", ngrid, 10000);
+  extractkvp(kvp, "tf_rmin", rmin, 0.0001);
+  extractkvp(kvp, "tf_rmax", rmax, 200.0);
+  set_logarithmic_grid(ngrid, rmin, rmax);
+
+  string key = "verbose";
+  verbose = false;
+  if( kvp.find(key) != kvp.end() )
+    if( kvp[key] == "true" ) 
+      verbose = true;
 }
 
 void atom_t::set_logarithmic_grid(int N, dble rmin, dble rmax) {
@@ -268,7 +287,8 @@ int atom_t::recompute_orbital(int lvl) {
     orbital[lvl].sigma[i] = 4.*pi*P[i]*P[i]; 
 
   // return number of iterations required
-  // printf("# n = %i, l = %i, occ = %2i, E = %22.15f, it = %i\n", n, l, occ, E, it);
+  if( verbose )
+    printf("# n = %i, l = %i, occ = %2i, E = %22.15f, it = %i\n", n, l, occ, E, it);
   return it;
 }
 
@@ -335,7 +355,7 @@ int atom_t::solve_self_consistent() {
     #pragma omp parallel for
     for(int i = 0; i < nlvl; i++)
       recompute_orbital(i);
-
+    
     // calculate total radial charge density
     recompute_charge();
 
@@ -367,8 +387,9 @@ void atom_t::solve_reg_fn(int l, dble rad, cplx E, zfunc *Rl, cplx *tl, dble *dl
   for(int i = 0; i < N && r[i] < rad; i++) MP = i;
 
   // warning: for debugging purposes only!
-  MP = 8121;
-  f[MP] = C + r[MP]*r[MP]*(-10.0-E);
+  // this is meant for finite square well
+  // MP = 8121;
+  // f[MP] = C + r[MP]*r[MP]*(-10.0-E);
 
   // find terms in series expansion
   //   f(r) = f0 + f1 r + f2 r^2 + ...
@@ -379,7 +400,6 @@ void atom_t::solve_reg_fn(int l, dble rad, cplx E, zfunc *Rl, cplx *tl, dble *dl
   // set boundary condition P_nl(r << 1) = A r^(l+1)
   // recall index=0 corresponds to r=r_min, and Q = dP/dx
   interval_t origin(0,3);
-//  solve_sch_taylor_origin(r, P, Q, l, f1, f2, origin); 
   solve_sch_riccati<bessel_j>(E, l, r, P, Q, origin); 
  
   // integrate outward from spherical bessel at origin
@@ -402,19 +422,14 @@ void atom_t::solve_reg_fn(int l, dble rad, cplx E, zfunc *Rl, cplx *tl, dble *dl
 
   cplx cdl = atan( (ld*jl-p*jlp)/(ld*nl-p*nlp) );
   *tl = -sin(cdl)*exp(im*cdl)/p;
-  // *dl = real_part(cdl);
 
   // change jost function into regular solution:
   //   Rl = jl - ip tl hl for r > R_cs
+  // also, phase dl = phase( limit( r->0, Rl(r)/jl(r) ) )
+  
   cplx hl = jl + im*nl;
   cplx A  = r[MP]*( jl - im*p*(*tl)*hl );
  
-  /*cplx jl0  = sph_bessel_jl(l, p*r[0]);
-  printf("%3d %20.15f %20.15f %20.15f %20.15f\n",l,
-      jl0.real(),jl0.imag(),
-      jl.real(),jl.imag()); */
-
-  // phase shift dl = phase( limit( r->0, Rl(r)/jl(r) ) )
   *dl = imag_part( log(A/P[MP]) );
 
   for(int i = 0; i <= MP; i++)

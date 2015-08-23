@@ -2,21 +2,14 @@
 
 #include "../../crystal/src/crystal.h"
 #include "../../util/src/extractkvp.h"
+#include "../../util/src/logger.h"
 #include <algorithm>
 #include <exception>
 #include <fstream>
 #include <ctime>
 #include <map>
 
-#define USE_MATH_DEFINES
-#include <cmath>
-
 using namespace std;
-
-// numerical constants
-const double tpi = 2.0*M_PI;
-const double fpi = 4.0*M_PI;
-const cplx im(0.0,1.0);
 
 green0_t::green0_t(map<string,string>& kvp) : crystal(NULL) {
   configure(kvp);
@@ -47,7 +40,6 @@ void green0_t::configure(map<string,string>& kvp) {
   // configure ewald parameters
   extractkvp(kvp,"green0.ewald.eta",eta,0.338925550376917);
   extractkvp(kvp,"green0.ewald.maxR",maxR,3.0);
-  maxR = tpi*maxR;
   extractkvp(kvp,"green0.ewald.maxK",maxK,3.36154726279432);
 
   // configure cache settings
@@ -66,8 +58,7 @@ void green0_t::configure(map<string,string>& kvp) {
     if( kvp[key] == "false" )
       cachemode = cachemode&(~CACHE_KSPACE); 
 
-  // configure Ewald method or Fourier transform
- 
+  // configure Ewald method or Fourier transform 
   calcmode = USE_EWALD;
   key = "green0.method";
   if( kvp.find(key) != kvp.end() )
@@ -94,23 +85,24 @@ void green0_t::configure(map<string,string>& kvp) {
   setcrystal(this->avec,this->basis);
 
   // print out settings
-  printf("Green0 R-space caching: ");
+  logger.focus("green0.settings");
+  logf("Green0 R-space caching: ");
   if(cachemode & CACHE_RSPACE) 
-    printf("enabled\n");
+    logf("enabled\n");
   else
-    printf("disabled\n");
+    logf("disabled\n");
 
-  printf("Green0 K-space caching: ");
+  logf("Green0 K-space caching: ");
   if(cachemode & CACHE_KSPACE) 
-    printf("enabled\n");
+    logf("enabled\n");
   else
-    printf("disabled\n");
+    logf("disabled\n");
 
-  printf("Green0 calculation scheme: ");
+  logf("Green0 calculation scheme: ");
   if(calcmode == USE_EWALD)
-    printf("Ewald method\n");
+    logf("Ewald method\n");
   else
-    printf("Fourier transform\n");
+    logf("Fourier transform\n");
 }
 
 void green0_t::setmaxl(const int maxl) {
@@ -198,7 +190,8 @@ void green0_t::setcrystal(const mat3& avec, const vector<vec3>& basis) {
   natom = basis.size();
 
   // debugging printout
-  printf("R-space lattice within R = %8.5E contains %i vectors.\n",
+  logger.focus("green0.settings");
+  logf("R-space lattice within R = %8.5E contains %i vectors.\n",
     maxR,(int)rlatt.size());
 
   // Generate reciprocal lattice
@@ -210,7 +203,7 @@ void green0_t::setcrystal(const mat3& avec, const vector<vec3>& basis) {
   if(log_times) timer.end();
 
   // debugging printout
-  printf("K-space lattice within K = %8.5E contains %i vectors.\n",
+  logf("K-space lattice within K = %8.5E contains %i vectors.\n",
     maxK,(int)klatt.size());
 
   // construct list of unique aij
@@ -218,9 +211,9 @@ void green0_t::setcrystal(const mat3& avec, const vector<vec3>& basis) {
   gen_aijlist();
   if(log_times) timer.end();
 
-  // export_lattice("rlatt.out",rlatt);
-  // export_lattice("klatt.out",klatt);
-  // export_lattice("aij.out",aijlist);
+  export_lattice("rlatt.out",rlatt);
+  export_lattice("klatt.out",klatt);
+  export_lattice("aij.out",aijlist);
 
   // if enabled, cache real-space values
   if(cachemode & CACHE_RSPACE) 

@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "../../util/mathfn.h"
+#include "../../util/src/mathfn.h"
 #include "gsl/gsl_interp.h"
 #include "gsl/gsl_sf_bessel.h"
 using namespace std;

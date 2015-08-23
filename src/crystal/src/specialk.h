@@ -20,8 +20,10 @@ class specialk_t {
     star_t(const crystal_t* cr) { bind(cr); }
     void bind(const crystal_t* cr) { crystal = cr; }
 
-    vec3 k; std::vector<int> symm_index;
-    vec3 operator[](int i); 
+    vec3 k; 
+    int weight() const { return symm_index.size(); }
+    std::vector<int> symm_index;
+    vec3 operator[](int i) const; 
   };
 
   std::vector<star_t> kstar;
@@ -33,6 +35,7 @@ public:
   void generate_monkhorst_pack(int n1, int n2, int n3);
 
   inline const star_t& operator[](int i) { return kstar[i]; }
+  int numk() { return kstar.size(); };
 };
 
 #endif

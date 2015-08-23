@@ -14,6 +14,7 @@
 using namespace std;
 
 #include "../../util/src/mathfn.h"
+#include "../../util/src/loadkvp.h"
 #include "atom.h"
 
 char speclett(int l) {
@@ -29,19 +30,20 @@ char speclett(int l) {
 
 int main(int argc, char *argv[]) {
 
-  // set number of grid points
-  int Z;
-  if( argc == 1 )
-    Z = 1;
-  else
-    Z = atoi(argv[1]);
+  // read in all key/value pairs from input
+  map<string,string> kvp;
+  bool good = safeloadkvp("input.txt",&kvp);
+  if( !good ) return -1;
 
   // set which atom to solve
-  atom_t atom;
-  atom.Z = Z;
+  atom_t atom(kvp);
+
+  printf("  solving Z = %d\n",atom.Z);
+  printf("grid points = %d\n",atom.N);
+  printf(" radial min = %-20.15f\n",atom.r[0]);
+  printf(" radial max = %-20.15f\n",atom.r[atom.N-1]);
 
   // fill an initial set of energy levels
-  atom.set_logarithmic_grid(10000, 0.0001, 200.0);
   atom.fill_madelung_orbitals();
   atom.fill_thomas_fermi_potential();
   atom.solve_self_consistent();

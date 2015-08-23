@@ -10,7 +10,7 @@
 #include <ctime>
 #include "../../util/src/mat3.h"
 #include "indexlm.h"
-#include "../../util/src/timing.h"
+#include "../../util/src/timer.h"
 
 typedef std::complex<double> cplx;
 class crystal_t;
@@ -46,7 +46,6 @@ private:
 
   // for timing calculations
   bool log_times;
-  timer_t timer;
 
   // crystal description
   // todo: replace w/ crystal*

@@ -1,6 +1,8 @@
 /* written by Suffian Khan Aug 2014 */
 
 #include "loadkvp.h"
+#include <fstream>
+#include <iostream>
 using namespace std;
 
 loadkvp::loadkvp(string filename, map<string,string>* kvp) {
@@ -203,4 +205,43 @@ void loadkvp::throwerror(int pos) {
   readerror re = {buffer, rs.line, pos};
   throw re;
 }
- 
+
+bool safeloadkvp(string filename, map<string,string>* kvp_in) {
+
+  map<string,string>& kvp = *kvp_in;
+
+  // read in all key/value pairs from input
+  try {
+    loadkvp("input.txt",&kvp);
+
+    // if requested to export key/value pairs
+    if( kvp.find("export.kvp") != kvp.end() &&
+        kvp["export.kvp"] == "true" ) {
+       
+      // print all key/value pairs to 'kvp.out'
+      ofstream file("kvp.out"); char buff[256];
+      sprintf(buff,"%30s %30s\n", "key", "value"); file << buff;
+      sprintf(buff,"%30s %30s\n", "---", "-----"); file << buff;
+      map<string,string>::iterator it = kvp.begin();
+      for(; it != kvp.end(); it++) {
+        sprintf(buff,"%30s %30s\n", it->first.c_str(), it->second.c_str());
+        file << buff;
+      } 
+      file.close();
+    }
+  }  
+  catch(loadkvp::readerror re) {
+    cout << re.message << endl; 
+    if(re.badline != "") cout << re.badline << endl;
+    if(re.badpos >= 0) {
+      for(int i = 0; i < re.badpos; i++)
+        cout << ' ';
+      cout << "^\n";
+    }
+    return false; 
+  }
+
+  return true;
+}
+
+

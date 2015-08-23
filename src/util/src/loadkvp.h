@@ -41,4 +41,7 @@ private:
 
 };
 
+// same as 'loadkvp' but performs error-handling itself
+bool safeloadkvp(std::string filename, std::map<std::string,std::string>* kvp); 
+
 #endif

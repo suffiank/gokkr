@@ -6,7 +6,7 @@ static mat3 idmat;
 bool symmetry_t::init_std_symm = false;
 
 static const dble tol = 1.e-06;
-static const dble pi  = M_PI;
+// static const dble pi  = M_PI;
 
 symmetry_t::symmetry_t() {
 
@@ -28,6 +28,7 @@ symmetry_t::symmetry_t() {
 
 void symmetry_t::configure(std::map<std::string,std::string>& kvp) {
 
+  find();
 }
 
 void symmetry_t::find_bravais_symmetry() {

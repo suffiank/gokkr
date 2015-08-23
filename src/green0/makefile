@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-O2
+CXXFLAGS=-O2 -std=c++11
 INCLUDE=-I/usr/local/Cellar/gsl/1.16/include
 LINK= obj/green0.a ../util/obj/util.a -L/usr/local/lib -lgsl -lgslcblas -lm
 EXEC=bin/strconst
@@ -13,7 +13,7 @@ all: obj/green0.a ../util/src/loadkvp.h
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/main.cc $(LINK) -o $(EXEC)
 
 clean:
-	rm -r bin/* obj/*
+	rm -f bin/* obj/*
 
 lib: obj/green0.a
 

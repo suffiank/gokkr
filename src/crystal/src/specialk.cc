@@ -1,10 +1,16 @@
 #include "crystal.h"
+#include "../../util/src/extractkvp.h"
 using namespace std;
 
 static const dble tol = 1.e-06;
 
 void specialk_t::configure(std::map<std::string,std::string>& kvp) {
 
+  int n1,n2,n3;
+  extractkvp(kvp,"specialk.n1",n1,8);
+  extractkvp(kvp,"specialk.n2",n2,8);
+  extractkvp(kvp,"specialk.n3",n3,8);
+  generate_monkhorst_pack(n1,n2,n3);
 }
 
 void specialk_t::bind(const crystal_t* cr) {
@@ -13,7 +19,7 @@ void specialk_t::bind(const crystal_t* cr) {
     kstar[i].bind(cr);
 }
 
-inline vec3 specialk_t::star_t::operator[](int i) { 
+inline vec3 specialk_t::star_t::operator[](int i) const { 
   return crystal->symmetry[ symm_index[i] ] * k;
 }
  
@@ -74,12 +80,12 @@ void specialk_t::fold_specialk(vector<vec3>& specialk) {
     int nstar = n;
 
     // debug check: print stars
-    printf("nstar = %d\n",nstar);
+    /* printf("nstar = %d\n",nstar);
     for(int i = 0; i < nstar; i++) {
       printf("%20.15f %20.15f %20.15f %d\n",
           kstar[i].k.x, kstar[i].k.y, kstar[i].k.z,
           (int)kstar[i].symm_index.size() );
-    }
+    } */
 }
 
 void specialk_t::reduce_to_bzone(vec3& kpoint) {

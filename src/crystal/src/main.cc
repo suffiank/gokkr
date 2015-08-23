@@ -2,13 +2,13 @@
 using namespace std;
 
 #include "../../util/src/mat3.h"
+#include "../../util/src/loadkvp.h"
 #include "crystal.h"
 
 int main(int argc, char **argv) {
 
-  crystal_t crystal;
 
-  mat3 avec;
+  /* mat3 avec;
   avec[0] = vec3(0.5,0.5,0.0); 
   avec[1] = vec3(0.0,0.5,0.5); 
   avec[2] = vec3(0.5,0.0,0.5); 
@@ -16,10 +16,15 @@ int main(int argc, char **argv) {
 
   vector<vec3> basis(1, vec3(0.0,0.0,0.0) );
   vector<int> siteid(1, 0);
-  crystal.set_basis(basis, siteid);
+  crystal.set_basis(basis, siteid); */
 
-  crystal.find_symmetry();
-  crystal.find_specialk(10,10,10);
+  map<string,string> kvp;
+  bool good = readkvp("input.txt",&kvp);
+  if( !good ) return -1;
+  
+  crystal_t crystal(kvp);
+  // crystal.find_symmetry();
+  // crystal.find_specialk(10,10,10); 
   
   /* for(int i = 0; i < crystal.symmetry.size(); i++) {
     printf("operation = %d\n",i+1);

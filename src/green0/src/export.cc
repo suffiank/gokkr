@@ -6,7 +6,7 @@ using namespace std;
 
 void green0_t::export_gmat(string filename, const cplx* Gij) {
 
-  if(log_times) timer.begin("Export G0 matrix");
+  if(log_times) timer.begin("Export g0 matrix");
 
   ofstream file(filename.c_str());
   char buff[256];

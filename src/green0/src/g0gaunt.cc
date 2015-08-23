@@ -32,8 +32,7 @@ void green0_t::calc_all_gaunt() {
     if(log_times) timer.end();
   } 
   catch(bad_alloc& ba) {
-    printf("error: insufficient memory to generate Gaunt coefficients\n");
-    throw ba;
+    throw("calc_all_gaunt: insufficient memory\n");
   }
 }
 

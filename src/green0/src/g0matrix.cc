@@ -4,7 +4,7 @@ using namespace std;
 
 void green0_t::calc_g0mat(cplx *Gmat, const cplx& z, const vec3& k) {
 
-  // note: it was more conveniant to have one routine that accesses
+  // note: it was more convenient to have one routine that accesses
   // k-vectors on an indexed list than separate routines for both cases
  
   // add 'k' to the list of kpoints

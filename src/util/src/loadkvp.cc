@@ -212,7 +212,7 @@ bool safeloadkvp(string filename, map<string,string>* kvp_in) {
 
   // read in all key/value pairs from input
   try {
-    loadkvp("input.txt",&kvp);
+    loadkvp(filename,&kvp);
 
     // if requested to export key/value pairs
     if( kvp.find("export.kvp") != kvp.end() &&

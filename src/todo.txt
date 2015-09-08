@@ -1,5 +1,5 @@
 # needed for minimal KKR run
- 
+
   phase shifts and t-matrix
    .. inclusion of MT-radius variable
    .. boundary conditions for Z and J
@@ -22,6 +22,7 @@
   contour integration
    .. get DoS = -1/pi Im int(G(E,r) dr)
    .. calculate gauss points & weights on semi-circle
+   .. calculate gauss points & weights by Newton's method
 
   integration over k-space
    .. create D operators from spherical harmonics

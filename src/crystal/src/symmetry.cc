@@ -1,4 +1,5 @@
 #include "crystal.h"
+#include "../../util/src/logger.h"
 #include <cstdlib>
 using namespace std;
 
@@ -82,7 +83,7 @@ void symmetry_t::find_bravais_symmetry() {
     if( n ==  4 ) system = "monoclinic";
     if( n ==  2 ) system = "triclinic";
     if( system == "" )
-      { printf("symmetry: failed to identify crystal system\n"); exit(1); }
+      throw string("symmetry: error: failed to identify crystal system\n");
   }
   suborder = subgroup.size();
 }
@@ -91,7 +92,8 @@ void symmetry_t::find_crystal_symmetry() {
 
     // determine crystal system and base group
     find_bravais_symmetry();
-    printf("system = %s\n",system.c_str());
+    logger.focus("symmetry");
+    logf("system = %s\n",system.c_str());
 
     // rewrite basis in lattice coordinates in 1st cell
     mat3 ainv = transpose(crystal->bvec);
@@ -309,6 +311,45 @@ void symmetry_t::fill_period(vector<mat3>& rotmat, int& n) {
     rotmat[++n] = mat;
     mat = rotmat[n] * rotmat[n0];
   }
+}
+
+
+void symmetry_t::make_quantum_rot() {
+
+  // suppose sites i,j connected to n,m via R(i)=n,R(j)=m
+  //   then op_LL' = <iL|op|jL'> = <R(iL)|op|R(jL')> by symmetry
+  // but |R(iL)> = |n R(L)> = j_nl(R^-1 r) Y_lm(R^-1 r) = j_nl(r) Y_lm(R^-1 r)
+  // and Y_lm(R^-1 r) = sum_L' D_L'L Y_L'(r)
+  //   where D_L'L = delta_ll' * int Y_lm'(r)* Y_lm(R^-1 r) dr
+  // therefore
+  //   op_LL' = sum_AB D_AL* op^nm_AB D_BL' = (D^dag op^nm D)_LL'
+
+  // for every symmetry operation
+  for(int i = 0; i < nsymm; i++) {
+
+    // make D_LL'
+    for(int l1 = 0, L1 = 0; l1 <= maxl; l1++)
+    for(int m1 = -l1; m1 <= l1; m1++, L1++)
+    for(int m2 = -l1; L2=l1*l1; m2 <= l1; m2++, L2++) {
+
+      double cth = x;
+      double sth = sqrt(1.0-x*x);
+      double cph = cos(phi);
+      double sph = sin(phi);
+
+      vec3 r(sth*cphi, sth*sphi, cth);
+      rp = rot[i]*r;
+
+      phi2 = atan2(rp.y,rp.x);
+
+      Y_L1 = gsl_sf_spherical_legendre(l1,m1,r)*exp(im*m1*phi);
+      Y_L2 = gsl_sf_spherical_legendre(l1,m2,rp)*exp(-im*m2*phi2);
+
+      D[i][L1][L2] += weight(x)*weight(phi)*conj(Y_L1)*Y_L2;
+    }
+
+  }
+
 }
 
 

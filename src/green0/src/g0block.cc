@@ -9,13 +9,9 @@
 
 #define USE_MATH_DEFINES
 #include <cmath>
+#include "../../util/src/ylm.h"
 
 using namespace std;
-
-// numerical constants
-const double tpi = 2.0*M_PI;
-const double fpi = 4.0*M_PI;
-const cplx im(0.0,1.0);
 
 // calculation of K-SPACE structure constants 'B^ij_LiLj' 
 // see Electron Scattering by Zabloudil, pg. 158 
@@ -156,7 +152,7 @@ inline void green0_t::add_dlm_ewald_rsum(cplx *Dlm, const cplx& z,
 
     vec3 rv = rlatt[i] + r;
     const double mrv = mag(rv);
-    calc_vlylm(rlylm,rv);
+    calc_vlylm(maxlp, Alm.data(), rlylm,rv);
     calc_intfac(intfac,z,mrv);
 
     cplx fac = A*exp(cplx(0.0,dot(rlatt[i],k)));
@@ -183,7 +179,7 @@ inline void green0_t::add_dlm_ewald_ksum(cplx *Dlm, const cplx& z,
 
     vec3 kv = klatt[i] + k;
     double kv2 = dot(kv,kv);
-    calc_vlylm(klylm,kv);
+    calc_vlylm(maxlp,Alm.data(),klylm,kv);
 
     cplx fac = A;
     fac *= exp(cplx(-kv2/eta,-dot(klatt[i],r)));
@@ -242,7 +238,7 @@ inline void green0_t::calc_dlm_fourier(cplx *Dlm, const cplx& z,
     calc_hankel(hl, p*mag(rvec));
   
     cplx ylm[numLp];
-    calc_vlylm(ylm, rvec);
+    calc_vlylm(maxlp, Alm.data(), ylm, rvec);
     double mrv = mag(rvec);
   
     cplx fac = -im, expf = p*exp(cplx(0.0,dot(k,rvec)));

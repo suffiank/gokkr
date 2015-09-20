@@ -131,10 +131,7 @@ private:
   // calculation of spherical harmonics:
   // Alm = sqrt( (2l+1)/4pi (l-m)!/(l+m)! ) 
   // note: plm storage index increments l before m
-  std::vector<double> Alm; 
-  void calc_ylm_norm();
-  void calc_plm(double *plm, const double& cth, const double& sth);
-  void calc_vlylm(cplx *vlylm, const vec3& v);
+  std::vector<double> Alm;
 
   void calc_all_rlylm();
   void export_rlylm();

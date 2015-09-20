@@ -12,13 +12,9 @@
 
 #include "gsl/gsl_sf_legendre.h"
 #include "gsl/gsl_integration.h"
+#include "../../util/src/ylm.h"
 
 using namespace std;
-
-// numerical constants
-const double tpi = 2.0*M_PI;
-const double fpi = 4.0*M_PI;
-const cplx im(0.0,1.0);
 
 // fill in gaunt coefficients:
 //   integral Y_L1(O) Y_L2(O) conj(Y_Lp(O)) dO
@@ -67,7 +63,7 @@ void green0_t::calc_all_gaunt_fixed() {
 
     // get associated legendres at x 
     double x = gltable->x[i];
-    calc_plm(&sphL[j][0],x,sqrt(1.0-x*x));
+    calc_plm(maxlp, &sphL[j][0],x,sqrt(1.0-x*x));
 
     // apply spherical harmonic normalization
     // note: l increments before m(>=0)
@@ -79,7 +75,7 @@ void green0_t::calc_all_gaunt_fixed() {
     if(isodd && i==0) continue;
   
     // otherwise include negative abscissa
-    calc_plm(&sphL[j][0],-x,sqrt(1.0-x*x));
+    calc_plm(maxlp, &sphL[j][0],-x,sqrt(1.0-x*x));
     for(int k = 0; k < numLp; k++) 
       sphL[j][k] *= Alm[k];
     j++;    

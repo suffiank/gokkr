@@ -2,6 +2,8 @@
 #include <cstdio>
 using namespace std;
 
+#include "../../util/src/ylm.h"
+
 void green0_t::calc_g0mat(cplx *Gmat, const cplx& z, const vec3& k) {
 
   // note: it was more convenient to have one routine that accesses
@@ -19,7 +21,7 @@ void green0_t::calc_g0mat(cplx *Gmat, const cplx& z, const vec3& k) {
     klylm_latt.push_back(klylm);
     for(int i = 0; i < klatt.size(); i++) {
       vec3 kvec = k + klatt[i];
-      calc_vlylm(klylm_latt[kindex][i].data(),kvec);
+      calc_vlylm(maxlp, Alm.data(), klylm_latt[kindex][i].data(),kvec);
     }
   }
 

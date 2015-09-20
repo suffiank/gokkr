@@ -3,12 +3,7 @@
 #include <cstdio>
 #include <vector>
 
-#define USE_MATH_DEFINES
-#include <cmath>
-
 using namespace std;
-
-const double tpi = 2.0*M_PI;
 
 void extractkvp(map<string,string>& kvp, const string& key, 
   double &value, double defaultval) {

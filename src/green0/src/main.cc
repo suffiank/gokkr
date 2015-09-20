@@ -11,11 +11,9 @@
 #include <ctime>
 #include "green0.h"
 #include "../../util/src/loadkvp.h"
+#include "../../util/src/logger.h"
 
 using namespace std;
-
-typedef complex<double> cplx;
-const double tpi = 2.0*M_PI;
 
 int main(int argc, char **argv) {
 
@@ -27,6 +25,7 @@ int main(int argc, char **argv) {
   try {
 
     // configure structure constants module 
+    logger.enable("green0.settings");
     green0_t g0module(kvp);
 
     // calculate structure constants
@@ -39,7 +38,7 @@ int main(int argc, char **argv) {
     kpoint.z = atof(kvp["kz"].c_str());
     vector<vec3> kpoints(1,kpoint);
     g0module.setkpoints(kpoints);
-  
+ 
     int matdim = g0module.get_g0dim();
     vector<cplx> Gmat(matdim*matdim);
     clock_t start, finish;

@@ -3,10 +3,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include "mathfn.h"
 
 #define _vec3tol_ 1e-13;
-
-typedef double dble;
 
 struct vec3 { 
   dble x,y,z; 

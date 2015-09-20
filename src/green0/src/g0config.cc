@@ -3,6 +3,7 @@
 #include "../../crystal/src/crystal.h"
 #include "../../util/src/extractkvp.h"
 #include "../../util/src/logger.h"
+#include "../../util/src/ylm.h"
 #include <algorithm>
 #include <exception>
 #include <fstream>
@@ -114,7 +115,8 @@ void green0_t::setmaxl(const int maxl) {
   numLp = (maxlp+1)*(maxlp+1);
 
   // calculate spherical harmonic normalization factors
-  calc_ylm_norm();
+  Alm.resize(numLp);
+  calc_ylm_norm(maxlp, Alm.data());
 
   // Generate gaunt coefficients 
   calc_all_gaunt();
@@ -252,7 +254,7 @@ void green0_t::calc_all_rlylm() {
   for(int j = 0; j < rlatt.size(); j++) {
     if( mag(aijlist[i]+rlatt[j]) < 1.e-13 ) continue;
     vec3 rvec = aijlist[i] + rlatt[j];
-    calc_vlylm(rlylm_latt[i][j].data(), rvec);
+    calc_vlylm(maxlp, Alm.data(), rlylm_latt[i][j].data(), rvec);
   }
   if(log_times) timer.end();
 
@@ -275,7 +277,7 @@ void green0_t::calc_all_klylm() {
   for(int j = 0; j < klatt.size(); j++) {
     if( mag(kpoints[i]+klatt[j]) < 1.e-13 ) continue;
     vec3 kvec = kpoints[i] + klatt[j];
-    calc_vlylm(klylm_latt[i][j].data(), kvec);
+    calc_vlylm(maxlp, Alm.data(), klylm_latt[i][j].data(), kvec);
   }
   if(log_times) timer.end();
 

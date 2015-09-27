@@ -323,33 +323,80 @@ void symmetry_t::make_quantum_rot() {
   //   where D_L'L = delta_ll' * int Y_lm'(r)* Y_lm(R^-1 r) dr
   // therefore
   //   op_LL' = sum_AB D_AL* op^nm_AB D_BL' = (D^dag op^nm D)_LL'
+  
+  // cache Ylm normalization factor
+  dble Alm[maxl];
+  calc_ylm_norm(maxl, Alm);
 
-  // for every symmetry operation
-  for(int i = 0; i < nsymm; i++) {
+  // tabulate Gauss-Legendre points and weights
+  // note: must specify power of two to get machine
+  //  precision numbers from the gsl library
+  int numw = 1 << (int)ceil(log2((double)numLp));
+  bool isodd = numw % 2;
+  int nstored = isodd? numw/2+1 : numw/2;
+  gsl_integration_glfixed_table *gltable =
+     gsl_integration_glfixed_table_alloc(numw);
 
-    // make D_LL'
-    for(int l1 = 0, L1 = 0; l1 <= maxl; l1++)
-    for(int m1 = -l1; m1 <= l1; m1++, L1++)
-    for(int m2 = -l1; L2=l1*l1; m2 <= l1; m2++, L2++) {
+  // note: the GSL library does not store negative absicca
+  // add negative absicca and store all points in one table
+  dble absicca[numw], weight[numw];
+  for(int i = 0, j = 0; i < nstored; i++) {
 
-      double cth = x;
-      double sth = sqrt(1.0-x*x);
-      double cph = cos(phi);
-      double sph = sin(phi);
+    // positive x
+    absicca[j]  = gltable->x[i];
+    weight[j++] = gltable->w[i];
 
-      vec3 r(sth*cphi, sth*sphi, cth);
-      rp = rot[i]*r;
+    // if x = 0, go to next abscissa
+    if(isodd && i==0) continue;
 
-      phi2 = atan2(rp.y,rp.x);
-
-      Y_L1 = gsl_sf_spherical_legendre(l1,m1,r)*exp(im*m1*phi);
-      Y_L2 = gsl_sf_spherical_legendre(l1,m2,rp)*exp(-im*m2*phi2);
-
-      D[i][L1][L2] += weight(x)*weight(phi)*conj(Y_L1)*Y_L2;
-    }
-
+    // negative x
+    absicca[j]  = -gltable->x[i];
+    weight[j++] =  gltable->w[i];
   }
 
+  // Gauss-Legendre integral over cos(theta)
+  for(int i_costh = 0, i_costh < numw; i_costh++) {
+    x = absicca[i_costh]; wx = weight[i_costh];
+
+    // Gauss-Legendre integral over phi
+    for(int i_phi = 0; i_phi < numw; i_phi++) {
+      phi = (1.0+absicca[i_phi])*pi; wphi = weight[i_phi];
+  
+      // for every symmetry operation
+      for(int i = 0; i < nsymm; i++) {
+  
+        // construct points r and R (r)
+        double cth = x;
+        double sth = sqrt(1.0-x*x);
+        double cph = cos(phi);
+        double sph = sin(phi);
+    
+        vec3 r(sth*cphi, sth*sphi, cth);
+        rp = rot[i]*r;
+    
+        // construct all r^l Y_L(r) and r^l Y_L(R r) 
+        cplx Ylm[numL], Ylm_rot[numL];
+        calc_vlylm(maxl, Alm, Ylm, r);
+        calc_vlylm(maxl, Alm, Ylm_rot, rp);
+        for(int l = 0, L = 0; l <= maxl; l++) 
+        for(int m = -l; m <= l; m++, L++) 
+          { Ylm[L] /= pow(r,l); Ylm_rot[L] /= pow(r,l); } 
+    
+        // make D_LL' along all non-zero subblocks
+        for(int l1 = 0, L1 = 0; l1 <= maxl; l1++)
+        for(int m1 = -l1; m1 <= l1; m1++, L1++)
+        for(int m2 = -l1; L2=l1*l1; m2 <= l1; m2++, L2++) {
+    
+          Y_L1 = Ylm[L1]; Y_L2 = Ylm_rot[L2]; 
+          D[i][L1][L2] += wx*wphi*conj(Y_L1)*Y_L2;
+        }
+
+      } 
+    } 
+  }
+
+  // free gauss-legendre table of abscissae and weights
+  gsl_integration_glfixed_table_free(gltable);
 }
 
 

@@ -1,5 +1,9 @@
 # needed for minimal KKR run
 
+  logger not printing variable arguments
+
+  make spherical harmonics a class
+
   phase shifts and t-matrix
    .. inclusion of MT-radius variable
    .. boundary conditions for Z and J

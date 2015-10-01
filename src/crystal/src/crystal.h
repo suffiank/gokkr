@@ -22,6 +22,7 @@ struct crystal_t {
   std::vector<int> siteid;
   std::vector<atom_t> atom;
   dble vol, bzvol;
+  int maxl, numL;
 
   crystal_t();
   crystal_t(std::map<std::string,std::string>& kvp);

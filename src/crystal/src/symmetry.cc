@@ -1,6 +1,9 @@
 #include "crystal.h"
 #include "../../util/src/logger.h"
 #include <cstdlib>
+#include <cmath>
+#include "../../util/src/ylm.h"
+#include "gsl/gsl_integration.h"
 using namespace std;
 
 static mat3 idmat;
@@ -314,15 +317,24 @@ void symmetry_t::fill_period(vector<mat3>& rotmat, int& n) {
 }
 
 
-void symmetry_t::make_quantum_rot() {
+void symmetry_t::make_sakuraiD() {
 
   // suppose sites i,j connected to n,m via R(i)=n,R(j)=m
   //   then op_LL' = <iL|op|jL'> = <R(iL)|op|R(jL')> by symmetry
   // but |R(iL)> = |n R(L)> = j_nl(R^-1 r) Y_lm(R^-1 r) = j_nl(r) Y_lm(R^-1 r)
   // and Y_lm(R^-1 r) = sum_L' D_L'L Y_L'(r)
-  //   where D_L'L = delta_ll' * int Y_lm'(r)* Y_lm(R^-1 r) dr
+  //   where D_L'L = delta_ll' * int Y_lm'(r)* Y_lm(R^-1 r) dr (angles only)
   // therefore
   //   op_LL' = sum_AB D_AL* op^nm_AB D_BL' = (D^dag op^nm D)_LL'
+  
+  // declare sizes and allocate space
+  const int maxl = crystal->maxl;
+  const int numL = crystal->numL;
+  sakuraiD.resize(nsymm);
+  for(int i = 0; i < nsymm; i++) {
+    sakuraiD[i].resize(numL*numL);
+    fill( sakuraiD[i].begin(), sakuraiD[i].end(), cplx(0.0,0.0) );
+  }
   
   // cache Ylm normalization factor
   dble Alm[maxl];
@@ -331,7 +343,7 @@ void symmetry_t::make_quantum_rot() {
   // tabulate Gauss-Legendre points and weights
   // note: must specify power of two to get machine
   //  precision numbers from the gsl library
-  int numw = 1 << (int)ceil(log2((double)numLp));
+  int numw = 1 << (int)ceil(log2((double)numL));
   bool isodd = numw % 2;
   int nstored = isodd? numw/2+1 : numw/2;
   gsl_integration_glfixed_table *gltable =
@@ -355,42 +367,38 @@ void symmetry_t::make_quantum_rot() {
   }
 
   // Gauss-Legendre integral over cos(theta)
-  for(int i_costh = 0, i_costh < numw; i_costh++) {
-    x = absicca[i_costh]; wx = weight[i_costh];
+  for(int i_costh = 0; i_costh < numw; i_costh++) {
+    dble x = absicca[i_costh], wx = weight[i_costh];
 
     // Gauss-Legendre integral over phi
     for(int i_phi = 0; i_phi < numw; i_phi++) {
-      phi = (1.0+absicca[i_phi])*pi; wphi = weight[i_phi];
-  
+      dble phi = (1.0+absicca[i_phi])*pi, wphi = weight[i_phi];
+ 
+      // construct point r
+      double cth = x;
+      double sth = sqrt(1.0-x*x);
+      double cph = cos(phi);
+      double sph = sin(phi);
+    
+      vec3 r(sth*cph, sth*sph, cth);
+      
+      // construct all Y_L(r)
+      // note: |r|^l = 1 because |r| = 1 
+      cplx Ylm[numL];
+      calc_vlylm(maxl, Alm, Ylm, r);
+
       // for every symmetry operation
-      for(int i = 0; i < nsymm; i++) {
-  
-        // construct points r and R (r)
-        double cth = x;
-        double sth = sqrt(1.0-x*x);
-        double cph = cos(phi);
-        double sph = sin(phi);
-    
-        vec3 r(sth*cphi, sth*sphi, cth);
-        rp = rot[i]*r;
-    
-        // construct all r^l Y_L(r) and r^l Y_L(R r) 
-        cplx Ylm[numL], Ylm_rot[numL];
-        calc_vlylm(maxl, Alm, Ylm, r);
+      for(int i = 0; i < nsymm; i++) { 
+
+        // construct all Y_L(R r)
+        cplx Ylm_rot[numL]; vec3 rp = crystal_symmetry[i]*r;
         calc_vlylm(maxl, Alm, Ylm_rot, rp);
-        for(int l = 0, L = 0; l <= maxl; l++) 
-        for(int m = -l; m <= l; m++, L++) 
-          { Ylm[L] /= pow(r,l); Ylm_rot[L] /= pow(r,l); } 
-    
+   
         // make D_LL' along all non-zero subblocks
         for(int l1 = 0, L1 = 0; l1 <= maxl; l1++)
         for(int m1 = -l1; m1 <= l1; m1++, L1++)
-        for(int m2 = -l1; L2=l1*l1; m2 <= l1; m2++, L2++) {
-    
-          Y_L1 = Ylm[L1]; Y_L2 = Ylm_rot[L2]; 
-          D[i][L1][L2] += wx*wphi*conj(Y_L1)*Y_L2;
-        }
-
+        for(int m2 = -l1, L2=l1*l1; m2 <= l1; m2++, L2++)
+          sakuraiD[i][L1*numL+L2] += wx*wphi*conj(Ylm[L1])*Ylm_rot[L2];
       } 
     } 
   }

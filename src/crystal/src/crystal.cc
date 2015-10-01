@@ -25,6 +25,10 @@ void crystal_t::configure(std::map<std::string,std::string>& kvp) {
   extract_lattvec(kvp, avec);
   set_bravais(this->avec);
 
+  // set maxl
+  extractkvp(kvp,"approximation.maxl",maxl,3);
+  numL = (maxl+1)*(maxl+1);
+
   // set basis
   extract_basis(kvp, basis);
   nsites = basis.size();

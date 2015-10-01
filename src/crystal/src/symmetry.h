@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include "../../util/src/mat3.h"
+#include "../../util/src/mathfn.h"
 class crystal_t;
 
 class symmetry_t {
@@ -21,6 +22,8 @@ class symmetry_t {
   std::string system, basegroup;
   std::vector<int> subgroup;
   int suborder;
+
+  std::vector< std::vector<cplx> > sakuraiD;
   
   void fill_cube_isometries(std::vector<mat3>& rotmat);
   void fill_hex_isometries(std::vector<mat3>& rotmat);
@@ -29,6 +32,7 @@ class symmetry_t {
 
   void find_bravais_symmetry();
   void find_crystal_symmetry();
+  void make_sakuraiD();
 
 public:
 

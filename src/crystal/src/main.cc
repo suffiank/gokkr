@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   crystal.set_basis(basis, siteid); */
 
   map<string,string> kvp;
-  bool good = readkvp("input.txt",&kvp);
+  bool good = safeloadkvp("input.txt",&kvp);
   if( !good ) return -1;
   
   crystal_t crystal(kvp);

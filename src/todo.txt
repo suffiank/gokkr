@@ -1,8 +1,7 @@
 # needed for minimal KKR run
 
-  logger not printing variable arguments
-
-  make spherical harmonics a class
+  .. logger not printing variable arguments
+  .. make spherical harmonics a class
 
   phase shifts and t-matrix
    .. inclusion of MT-radius variable
@@ -31,7 +30,7 @@
   integration over k-space
    .. create D operators from spherical harmonics
 
-  total energy
+  total energy (use Janak)
    .. calculate Madelung matrix
    .. calculate Coloumb term
    .. sum core energies and valence bands

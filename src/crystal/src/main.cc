@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
       for(int L1 = 0; L1 < crystal.numL; L1++) {
         for(int L2 = 0; L2 < crystal.numL; L2++) {
           cplx el = crystal.symmetry.sakuraiD[i][L1*crystal.numL+L2];
-          printf(" %20.10f%20.10f", el.real(), el.imag());
+          printf(" (%20.10f+i%20.10f)", el.real(), el.imag());
         }
         printf("\n");
       }

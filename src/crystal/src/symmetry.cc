@@ -337,7 +337,7 @@ void symmetry_t::make_sakuraiD() {
   }
   
   // cache Ylm normalization factor
-  dble Alm[maxl];
+  dble Alm[numL];
   calc_ylm_norm(maxl, Alm);
 
   // tabulate Gauss-Legendre points and weights
@@ -372,7 +372,7 @@ void symmetry_t::make_sakuraiD() {
 
     // Gauss-Legendre integral over phi
     for(int i_phi = 0; i_phi < numw; i_phi++) {
-      dble phi = (1.0+absicca[i_phi])*pi, wphi = weight[i_phi];
+      dble phi = (1.0+absicca[i_phi])*pi, wphi = pi*weight[i_phi];
  
       // construct point r
       double cth = x;
@@ -397,7 +397,7 @@ void symmetry_t::make_sakuraiD() {
         // make D_LL' along all non-zero subblocks
         for(int l1 = 0, L1 = 0; l1 <= maxl; l1++)
         for(int m1 = -l1; m1 <= l1; m1++, L1++)
-        for(int m2 = -l1, L2=l1*l1; m2 <= l1; m2++, L2++)
+        for(int L2=l1*l1; L2 < (l1+1)*(l1+1); L2++)
           sakuraiD[i][L1*numL+L2] += wx*wphi*conj(Ylm[L1])*Ylm_rot[L2];
       } 
     } 

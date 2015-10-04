@@ -8,10 +8,10 @@ OBJECTS= \
 	obj/crystal.o obj/symmetry.o obj/specialk.o
 
 test: obj/crystal.a
-	$(CXX) $(CXXFLAGS) $(INCLUDE) src/main.cc $(LINK) -o bin/test 
+	$(CXX) $(CXXFLAGS) $(INCLUDE) src/main.cc $(LINK) -o bin/test
 
 clean:
-	rm -r bin/* obj/*
+	rm -r bin/test obj/*
 
 lib: obj/crystal.a
 

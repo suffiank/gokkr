@@ -1,6 +1,5 @@
 # needed for minimal KKR run
 
-  .. logger not printing variable arguments
   .. make spherical harmonics a class
 
   phase shifts and t-matrix
@@ -28,10 +27,9 @@
    .. calculate gauss points & weights by Newton's method
 
   integration over k-space
-   .. create D operators from spherical harmonics
+   .. confirm sakurai D operators are correct
 
   total energy (use Janak)
    .. calculate Madelung matrix
    .. calculate Coloumb term
    .. sum core energies and valence bands
-

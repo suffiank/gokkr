@@ -6,6 +6,9 @@ OBJECTS=obj/extractkvp.o obj/loadkvp.o obj/timer.o obj/logger.o obj/ylm.o
 all: $(OBJECTS)
 	ar rcs obj/util.a $(OBJECTS)
 
+test:
+	$(CXX) $(CXXFLAGS) src/main.cc obj/util.a -o bin/test
+
 clean:
 	rm -f bin/* obj/*
 

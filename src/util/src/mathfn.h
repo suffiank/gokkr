@@ -33,6 +33,9 @@ const dble tpi = 2.0*M_PI;
 const dble fpi = 4.0*M_PI;
 const cplx im = cplx(0.0,1.0);
 
+// Gauss-Legendre grid
+void fill_gauss_legendre_table(int n, dble* x, dble* w);
+
 // fitting
 // warning: poor precision unless near x = 0
 template<typename T, typename F>

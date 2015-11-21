@@ -11,7 +11,7 @@ all:
 	cd atom; make lib
 	cd green0; make lib
 	cd crystal; make lib
-	$(CXX) $(CXXFLAGS) $(INCLUDE) main.cc $(LINK) -o ../bin/knoxkkr
+	$(CXX) $(CXXFLAGS) $(INCLUDE) driver.cc $(LINK) -o ../bin/knoxkkr
 
 clean:
 	rm -f green0/obj/*

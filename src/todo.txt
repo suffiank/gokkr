@@ -1,5 +1,6 @@
 # needed for minimal KKR run
 
+  nice to have
   .. make spherical harmonics a class
 
   phase shifts and t-matrix

@@ -120,7 +120,7 @@ void green0_t::setmaxl(const int maxl) {
 
   // Generate gaunt coefficients 
   calc_all_gaunt();
-  // export_gaunt();
+  export_gaunt();
 
   // if enabled, cache real-space values
   if(cachemode & CACHE_RSPACE) 
@@ -258,7 +258,7 @@ void green0_t::calc_all_rlylm() {
   }
   if(log_times) timer.end();
 
-  // export_rlylm();
+  export_rlylm();
 }
 
 void green0_t::calc_all_klylm() {
@@ -281,7 +281,7 @@ void green0_t::calc_all_klylm() {
   }
   if(log_times) timer.end();
 
-  // export_klylm(); 
+  export_klylm(); 
 }
 
 void green0_t::setkpoints(const vector<vec3>& kpoints) {

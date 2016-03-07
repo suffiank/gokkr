@@ -4,7 +4,9 @@ LINK= \
   atom/obj/atom.a crystal/obj/crystal.a \
 	green0/obj/green0.a util/obj/util.a \
   -L/usr/local/lib -lgsl -lgslcblas -lm
-INCLUDE=-I../../../util/eigen-3.2.5/
+INCLUDE=-I../../../util/eigen-3.2.5/ \
+	-Iatom/src/ -Igreen0/src -Iutil/src \
+	-Icrystal/src/
 
 all:
 	cd util; make lib

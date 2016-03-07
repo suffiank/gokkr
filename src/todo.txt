@@ -1,36 +1,17 @@
-# needed for minimal KKR run
-
-  nice to have
-  .. make spherical harmonics a class
-
-  phase shifts and t-matrix
-   .. inclusion of MT-radius variable
-   .. boundary conditions for Z and J
-   .. make fitting of f(x) for RK4 efficient
-   
-  Greens function G = Z tau00 Z - Z J
-   .. calculate int(Z Z), int(Z J)
-   .. get charge density from -1/pi Im(.)
-
-  core solver for MT-case
-   .. correct determination of matching point
-   .. how to treat semi-core with leaking charge?
-
-  calculation of muffin-tin zero
-   .. assume v0 = 0 (i.e. non-variational)??
-
-  poisson solver 
-   .. integrate inward from v0 = 0??
-  
-  contour integration
-   .. get DoS = -1/pi Im int(G(E,r) dr)
-   .. calculate gauss points & weights on semi-circle
-   .. calculate gauss points & weights by Newton's method
-
-  integration over k-space
-   .. confirm sakurai D operators are correct
-
-  total energy (use Janak)
-   .. calculate Madelung matrix
-   .. calculate Coloumb term
-   .. sum core energies and valence bands
+ .. remove references to GSL Gauss-Legendre
+ .. flatten/simplfiy the kstar_t type
+ .. validate Sakurai D operators
+ .. make spherical harmonics a class
+ .. include MT-radius for phase shift
+ .. boundary conditions to get Z and J
+ .. make fitting of f(x) for RK4 efficient
+ .. calculate int(Z Z), int(Z J)
+ .. get charge density from -1/pi Im(.)
+ .. correct core-solver matching point
+ .. how to treat semi-core with leaking charge?
+ .. how to calcuate muffin-tin zero?
+ .. get DoS = -1/pi Im int(G(E,r) dr)
+ .. calculate gauss points & weights on semi-circle
+ .. calculate Madelung matrix
+ .. calculate Coloumb term
+ .. sum core energies and valence bands

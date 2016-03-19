@@ -12,6 +12,7 @@ void timer_t::begin(string label) {
   if( T != times.end() )
     T->second.second = double(clock());
   else
+    // warning: this line is broken! leads to seg fault
     T->second = pair<double,double>(0.0, double(clock()));
   lastlabel = label;
 }

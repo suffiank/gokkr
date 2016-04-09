@@ -1,0 +1,3 @@
+specialk.o: src/specialk.cc src/crystal.h src/mat3.h src/vec3.h \
+ src/mathfn.h src/extractkvp.h src/symmetry.h src/specialk.h src/green0.h \
+ src/indexlm.h src/timer.h src/atom.h

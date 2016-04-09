@@ -5,20 +5,27 @@
 CXX=g++
 CXXFLAGS=-O2 -std=c++11 -fopenmp
 
-INCLUDE=-isystem../../util/eigen-3.2.8/
+INCLUDE=-isystem../../tools/eigen-3.2.8/
 EXT_LINK= -L/usr/local/lib -lgsl -lgslcblas -lm
 
 # all object files sorted by module
-UTIL_OBJ= extractkvp.o loadkvp.o timer.o logger.o ylm.o mathfn.o
-ATOM_OBJ= atom.o
-STRC_OBJ= export.o g0block.o g0aij.o g0config.o g0factor.o \
-  g0gaunt.o g0latt.o g0matrix.o faddeeva.o 
-CRYS_OBJ= crystal.o symmetry.o specialk.o
+UTIL_SRC= extractkvp.cc loadkvp.cc timer.cc logger.cc ylm.cc mathfn.cc
+ATOM_SRC= atom.cc
+STRC_SRC= export.cc g0block.cc g0aij.cc g0config.cc g0factor.cc \
+  g0gaunt.cc g0latt.cc g0matrix.cc faddeeva.cc 
+CRYS_SRC= crystal.cc symmetry.cc specialk.cc
 
-UTIL_OBJS= $(addprefix obj/,$(UTIL_OBJ))
-ATOM_OBJS= $(addprefix obj/,$(ATOM_OBJ))
-STRC_OBJS= $(addprefix obj/,$(STRC_OBJ))
-CRYS_OBJS= $(addprefix obj/,$(CRYS_OBJ))
+UTIL_SRCS= $(addprefix src/,$(UTIL_SRC))
+ATOM_SRCS= $(addprefix src/,$(ATOM_SRC))
+STRC_SRCS= $(addprefix src/,$(STRC_SRC))
+CRYS_SRCS= $(addprefix src/,$(CRYS_SRC))
+SOURCES= $(UTIL_SRCS) $(ATOM_SRCS) $(STRC_SRCS) $(CRYS_SRCS)
+
+UTIL_OBJS= $(addprefix obj/,$(UTIL_SRC:.cc=.o))
+ATOM_OBJS= $(addprefix obj/,$(ATOM_SRC:.cc=.o))
+STRC_OBJS= $(addprefix obj/,$(STRC_SRC:.cc=.o))
+CRYS_OBJS= $(addprefix obj/,$(CRYS_SRC:.cc=.o))
+OBJECTS= $(UTIL_OBJS) $(ATOM_OBJS) $(STRC_OBJCS) $(CRYS_OBJS)
 
 INT_LINK= $(addprefix obj/,util.a atom.a green0.a crystal.a)
 LINK= $(INT_LINK) $(EXT_LINK)
@@ -52,20 +59,25 @@ obj/green0.a: $(STRC_OBJS)
 obj/%.o: src/%.cc
 	$(CXX) -c $(CXXFLAGS) $(INCLUDE) $< -o $@
 
-obj/%.o: ext/%.cc
-	$(CXX) -c $(CXXFLAGS) $(INCLUDE) $< -o $@
+# object to header dependencies
+depend: .depend
 
-# object to source dependencies
-obj/extractkvp.o: src/extractkvp.h
-obj/loadkvp.o: src/loadkvp.h
-obj/timing.o: src/timing.h
-obj/logger.o: src/logger.h
-obj/ylm.o: src/ylm.h
-obj/mathfn.o: src/mathfn.h
-obj/crystal.o: src/crystal.h
-obj/symmetry.o: src/crystal.h
-obj/specialk.o: src/crystal.h
-src/crystal.h: src/symmetry.h src/specialk.h src/mat3.h
-obj/g0*.o: src/green0.h
-obj/export.o: src/green0.h
-obj/g0config.o: src/extractkvp.h
+.depend: $(SOURCES)
+	rm -f ./.depend
+	$(CXX) $(CXXFLAGS) -MM $^ -MF  ./.depend;
+
+include .depend
+
+# obj/extractkvp.o: src/extractkvp.h
+# obj/loadkvp.o: src/loadkvp.h
+# obj/timing.o: src/timing.h
+# obj/logger.o: src/logger.h
+# obj/ylm.o: src/ylm.h
+# obj/mathfn.o: src/mathfn.h
+# obj/crystal.o: src/crystal.h
+# obj/symmetry.o: src/crystal.h
+# obj/specialk.o: src/crystal.h
+# src/crystal.h: src/symmetry.h src/specialk.h src/mat3.h
+# obj/g0*.o: src/green0.h
+# obj/export.o: src/green0.h
+# obj/g0config.o: src/extractkvp.h

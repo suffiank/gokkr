@@ -1,53 +1,85 @@
+// written by Suffian Khan
+// circa 3/23/2016
+
 #include "timer.h"
 #include <algorithm>
 #include <ctime>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <pthread.h>
+#include <unistd.h>
 using namespace std;
 
-timer_t timer;
-typedef pair< string, pair<double,double> > timer_entry_t;
-typedef map< string, pair<double,double> >::iterator iter_t;
+mytimer_t timer;
 
-void timer_t::begin(string label) {
+// strip profiling in production code
+#ifndef PROFILE
 
-  iter_t T = times.find(label);
-  if( T != times.end() )
-    T->second.second = double(clock());
-  else
-    ; // T->emplace( label, pair<double,double>(0.0, double(clock())) );
-  lastlabel = label;
-}
+void mytimer_t::dump() {}
 
-void timer_t::end(string label) {
+#else
 
-  clock_t finish = clock();
-  iter_t T = times.find(label);
-  if( T != times.end() ) {
-    clock_t start = T->second.second;
-    double elapsed = (double(finish-start)/CLOCKS_PER_SEC);
-    T->second.first += elapsed; T->second.second = elapsed;
+void mytimer_t::dump() {
+
+  FILE* file = fopen("timing.out","w");
+    
+  int maxlabel = 10, maxtime = 12;
+  int maxcount = 8, maxid = 8;
+  for(int i = 0; i < hashsize; i++)
+    if( seghash[i].label.length() != 0 ) {
+
+    char buff[48]; int len;
+
+    if( seghash[i].label.length() > maxlabel ) 
+      maxlabel = seghash[i].label.length();
+
+    snprintf(buff, 48, "%i", i); 
+    len = strlen(buff);
+    if( len > maxid ) maxid = len;
+ 
+    snprintf(buff, 48, "%i", seghash[i].count); 
+    len = strlen(buff);
+    if( len > maxcount ) maxcount = len;
+    
+    snprintf(buff, 48, "%.5f", seghash[i].accum); 
+    len = strlen(buff);
+    if( len > maxtime ) maxtime = len;
   }
-  else
-    throw string("timer_t:: attempt to end() non-existant clock");
+
+  fprintf(file,"#%-*s%*s%*s%*s%*s\n", 
+    maxlabel, " label", ++maxid, "hash", ++maxcount, "count", 
+    ++maxtime, "total(s)", maxtime, "average(s)");
+
+  double curr = double(clock());
+  for(int i = 0; i < hashsize; i++)
+    if( seghash[i].label.length() != 0 ) {
+      timeseg_t& ts = seghash[i];
+      
+      fprintf(file,"%-*s%*d%*d%*.5f%*.5f\n", 
+        maxlabel+1, ts.label.c_str(), maxid, i,
+        maxcount, ts.count, maxtime, 
+        ts.accum + (ts.open?(curr-ts.clockedat)/CLOCKS_PER_SEC:0), 
+        maxtime, ts.accum/ts.count);
+    }
+ 
+  fclose(file);
 }
 
-void timer_t::clear(string label) {
+void* autolog_timer_main(void* arg) {
 
-  iter_t T = times.find(label);
-  if( T != times.end() ) times.erase(T);
-}
+  double interval = *( (double*)arg );
+  int microsec = int(1000000.*interval);
+  while(true) 
+   { timer.dump(); usleep(microsec); }
+  return NULL;
+} 
 
-double timer_t::last(string label) {
-  
-  iter_t T = times.find(label);
-  if( T != times.end() )
-    return T->second.second;
-  return 0.0;
-}
+void mytimer_t::autolog(double interval) {
 
-double timer_t::total(string label) {
+  static double arg = interval;
+  if( tid != pthread_t(-1) ) pthread_cancel(tid);
+  pthread_create(&tid, NULL, autolog_timer_main, (void*)(&arg));
+} 
 
-  iter_t T = times.find(label);
-  if( T != times.end() )
-    return T->second.first;
-  return 0.0;
-}
+#endif

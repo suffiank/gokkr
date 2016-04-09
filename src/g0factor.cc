@@ -14,7 +14,7 @@
 #include "gsl/gsl_matrix.h"
 #include "gsl/gsl_integration.h"
 #include "gsl/gsl_sort.h"
-#include "../ext/faddeeva.hh"
+#include "faddeeva.hh"
 
 using namespace std;
 using namespace Faddeeva;

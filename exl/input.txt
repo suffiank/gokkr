@@ -1,0 +1,8 @@
+
+crystal.lattice:
+  x=0.5 y=0.5 z=0.0
+  x=0.0 y=0.5 z=0.5
+  x=0.5 y=0.0 z=0.5
+
+crystal.basis:
+  x=0.0 y=0.0 z=0.0

@@ -25,10 +25,14 @@ UTIL_OBJS= $(addprefix obj/,$(UTIL_SRC:.cc=.o))
 ATOM_OBJS= $(addprefix obj/,$(ATOM_SRC:.cc=.o))
 STRC_OBJS= $(addprefix obj/,$(STRC_SRC:.cc=.o))
 CRYS_OBJS= $(addprefix obj/,$(CRYS_SRC:.cc=.o))
-OBJECTS= $(UTIL_OBJS) $(ATOM_OBJS) $(STRC_OBJCS) $(CRYS_OBJS)
+OBJECTS= $(UTIL_OBJS) $(ATOM_OBJS) $(STRC_OBJS) $(CRYS_OBJS)
 
 INT_LINK= $(addprefix obj/,util.a atom.a green0.a crystal.a)
 LINK= $(INT_LINK) $(EXT_LINK)
+
+# debugging output
+$(info $$SOURCES is [${SOURCES}])
+$(info $$OBJECTS is [${OBJECTS}])
 
 # primary executables and clean script
 all: direct obj/util.a obj/atom.a obj/green0.a obj/crystal.a
@@ -38,7 +42,7 @@ direct:
 	mkdir -p obj/; mkdir -p bin/
 
 clean:
-	rm -f bin/* obj/*
+	rm -f bin/* obj/* .depend
 
 .phony: all clean direct
 
@@ -60,24 +64,11 @@ obj/%.o: src/%.cc
 	$(CXX) -c $(CXXFLAGS) $(INCLUDE) $< -o $@
 
 # object to header dependencies
+# not working?? 
 depend: .depend
 
 .depend: $(SOURCES)
 	rm -f ./.depend
-	$(CXX) $(CXXFLAGS) -MM $^ -MF  ./.depend;
+	$(CXX) $(CXXFLAGS) -MM $^ >  ./.depend;
 
 include .depend
-
-# obj/extractkvp.o: src/extractkvp.h
-# obj/loadkvp.o: src/loadkvp.h
-# obj/timing.o: src/timing.h
-# obj/logger.o: src/logger.h
-# obj/ylm.o: src/ylm.h
-# obj/mathfn.o: src/mathfn.h
-# obj/crystal.o: src/crystal.h
-# obj/symmetry.o: src/crystal.h
-# obj/specialk.o: src/crystal.h
-# src/crystal.h: src/symmetry.h src/specialk.h src/mat3.h
-# obj/g0*.o: src/green0.h
-# obj/export.o: src/green0.h
-# obj/g0config.o: src/extractkvp.h

@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cstdint>
 #include <cstdio>
+#include <pthread.h>
 
 // timed segment representation
 struct timeseg_t { 

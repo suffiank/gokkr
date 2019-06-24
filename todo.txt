@@ -1,3 +1,4 @@
+ .. add clangformat and revise to convention
  .. remove references to GSL Gauss-Legendre
  .. flatten/simplify the makefile system
  .. validate Sakurai D operators

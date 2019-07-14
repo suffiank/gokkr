@@ -5,8 +5,8 @@
 CXX=g++
 CXXFLAGS=-O2 -std=c++11 -fopenmp
 
-INCLUDE=-isystem../../tools/eigen-3.2.8/
-EXT_LINK= -L/usr/local/lib -lgsl -lgslcblas -lm
+INCLUDE=-isystem./3rdparty/eigen -isystem./3rdparty/gsl/include
+EXT_LINK= -L./3rdparty/gsl/lib -lgsl -lgslcblas -lm
 
 # made use of bash syntax
 SHELL=/bin/bash
@@ -32,7 +32,7 @@ CRYS_OBJS= $(addprefix obj/,$(CRYS_SRC:.cc=.o))
 OBJECTS= $(UTIL_OBJS) $(ATOM_OBJS) $(STRC_OBJS) $(CRYS_OBJS)
 
 # add internal static libraries to linking
-INT_LINK= $(addprefix obj/,util.a atom.a green0.a crystal.a)
+INT_LINK= $(addprefix obj/,crystal.a atom.a green0.a util.a)
 LINK= $(INT_LINK) $(EXT_LINK)
 
 # primary executables and scripts
@@ -70,10 +70,23 @@ obj/%.o: src/%.cc
 	$(CXX) -c $(CXXFLAGS) $(INCLUDE) $< -o $@
 	$(eval MSG=DONE)
 
+# external dependencies
+3rdparty/gsl:
+	@echo " .. downloading, building, and installing 3rdparty/gsl .. "
+	@$(eval GSL_BUILD_DIR := $(shell mktemp -d))
+	@echo $(GSL_BUILD_DIR)
+	@-(curl -o $(GSL_BUILD_DIR)/gsl.tgz http://ftp.gnu.org/gnu/gsl/gsl-latest.tar.gz)
+	@-(cd $(GSL_BUILD_DIR) && mkdir gsl && tar -xf gsl.tgz -C gsl --strip-components 1)
+	@-(cd $(GSL_BUILD_DIR)/gsl && ./configure --prefix=$(CURDIR)/3rdparty/gsl && make && make install)
+	@rm -fr $(GSL_BUILD_DIR)
+
+3rdparty/eigen:
+	@git submodule init
+
 # object to header dependencies
 depend: .depend
 
-.depend: $(SOURCES)
+.depend: $(SOURCES) 3rdparty/gsl 3rdparty/eigen
 	@echo " .. building dependencies .. "
 	@rm -f ./.depend
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -MM $(SOURCES) >  ./.depend;

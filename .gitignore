@@ -1,3 +1,5 @@
 bin/
 obj/
 sbox/*
+3rdparty/*
+.depend

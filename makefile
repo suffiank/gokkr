@@ -82,7 +82,7 @@ obj/%.o: src/%.cc
 
 3rdparty/eigen:
 	@echo " .. initializing 3rdparty/gsl .. "
-	@git submodule init
+	@git submodule update --init
 
 # object to header dependencies
 depend: .depend

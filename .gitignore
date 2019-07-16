@@ -1,5 +1,5 @@
 bin/
 obj/
 sbox/*
-3rdparty/*
+3rdparty/gsl
 .depend

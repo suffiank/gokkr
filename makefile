@@ -81,12 +81,13 @@ obj/%.o: src/%.cc
 	@rm -fr $(GSL_BUILD_DIR)
 
 3rdparty/eigen:
+	@echo " .. initializing 3rdparty/gsl .. "
 	@git submodule init
 
 # object to header dependencies
 depend: .depend
 
-.depend: $(SOURCES) 3rdparty/gsl 3rdparty/eigen
+.depend: $(SOURCES) | 3rdparty/gsl 3rdparty/eigen
 	@echo " .. building dependencies .. "
 	@rm -f ./.depend
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -MM $(SOURCES) >  ./.depend;

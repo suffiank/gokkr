@@ -8,6 +8,9 @@ CXXFLAGS=-O2 -std=c++11 -fopenmp
 INCLUDE=-isystem./3rdparty/eigen -isystem./3rdparty/gsl/include
 EXT_LINK= -L./3rdparty/gsl/lib -lgsl -lgslcblas -lm
 
+# bake in runpath relative to bin location
+EXT_LINK+= -Wl,--enable-new-dtags,-rpath,'$$ORIGIN/../3rdparty/gsl/lib'
+
 # made use of bash syntax
 SHELL=/bin/bash
 
@@ -36,7 +39,7 @@ INT_LINK= $(addprefix obj/,crystal.a atom.a green0.a util.a)
 LINK= $(INT_LINK) $(EXT_LINK)
 
 # primary executables and scripts
-all: dir obj/util.a obj/atom.a obj/green0.a obj/crystal.a
+all: obj/util.a obj/atom.a obj/green0.a obj/crystal.a | dir
 	@echo " .. linking executable .. "
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/driver.cc $(LINK) -o bin/gokkr
 
@@ -49,7 +52,7 @@ clean:
 print-%:
 	@echo '$*=$($*)'
 
-.phony: all clean dir print-%
+.phony: all clean dir depend print-%
 
 # static library dependencies
 obj/util.a: $(UTIL_OBJS)
@@ -93,4 +96,4 @@ depend: .depend
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -MM $(SOURCES) >  ./.depend;
 	@sed -i 's|\(^.*:\)|obj/\1|' .depend
 
-include .depend
+-include .depend

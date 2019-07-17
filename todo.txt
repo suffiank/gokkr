@@ -1,7 +1,9 @@
- .. add clangformat and revise to convention
- .. remove references to GSL Gauss-Legendre
- .. flatten/simplify the makefile system
+ .. add unit tests for existing modules 
  .. validate Sakurai D operators
+ .. validate structure constants
+ .. add clangformat and revise to convention
+
+ .. remove references to GSL Gauss-Legendre
  .. make spherical harmonics a class
  .. include MT-radius for phase shift
  .. boundary conditions to get Z and J
@@ -16,4 +18,3 @@
  .. calculate Madelung matrix
  .. calculate Coloumb term
  .. sum core energies and valence bands
- .. need testing routines for structure constants

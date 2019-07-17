@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   
   try {
     crystal_t crystal(kvp);
-    // crystal.find_symmetry();
+    crystal.find_symmetry();
     crystal.find_specialk(10,10,10); 
     // crystal.symmetry.make_sakuraiD(); 
     
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
           crystal.symmetry[i][2][2]);
     } 
 
-    /* for(int i = 0; i < crystal.symmetry.size(); i++) {
+    for(int i = 0; i < crystal.symmetry.size(); i++) {
       printf("operation = %d\n",i+1);
       for(int L1 = 0; L1 < crystal.numL; L1++) {
         for(int L2 = 0; L2 < crystal.numL; L2++) {
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
         }
         printf("\n");
       }
-    } */
+    }
   }
   catch(string emessage) {
     cout << emessage << endl;

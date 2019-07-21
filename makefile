@@ -28,7 +28,7 @@ SHELL=/bin/bash
 # -----------------------------------------------------------------------------
 # curl is used to download gnu scientific library
 # cmake is ued to build googletest
-EXECUTABLES = $(CC) $(CXX) curl cmake
+EXECUTABLES = $(CC) $(CXX) ar curl cmake
 K := $(foreach exec, $(EXECUTABLES),\
    $(if $(shell which $(exec)), dummy, $(error Missing required path executable '$(exec)')))
 
@@ -59,16 +59,16 @@ LINK= $(INT_LINK) $(EXT_LINK)
 
 # targets for primary executables, static libraries, and scripts
 # -----------------------------------------------------------------------------
+.PHONY: all clean depend test force print-% 
+
 all: obj/util.a obj/atom.a obj/green0.a obj/crystal.a src/driver.cc | bin
 	@echo " .. linking executable .. "
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/driver.cc $(LINK) -o bin/gokkr
 
-.phony: all clean depend test force print-% 
-
 bin:
 	@mkdir -p bin/
 
-test: obj/util.a obj/atom.a obj/green0.a obj/crystal.a src/test_levels.cc force
+test: obj/util.a obj/atom.a obj/green0.a obj/crystal.a src/test_levels.cc
 	@echo " .. building and executing tests .."
 	@-(mkdir -p test)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) src/test_levels.cc $(LINK) -o test/atomic_solver

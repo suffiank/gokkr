@@ -4,8 +4,11 @@
 #include <vector>
 using namespace std;
 
-#include "../../util/src/mathfn.h"
+#include "gtest/gtest.h"
+#include "mathfn.h"
 #include "atom.h"
+
+namespace {
 
 char speclett(int l) {
   switch(l) {
@@ -18,8 +21,8 @@ char speclett(int l) {
   };
 }
 
-int main(int argc, char *argv[]) {
-
+TEST(AtomicSolver, ColoumbPotential) {
+	
   atom_t atom;
   int n, l, reqit[10][10];
 
@@ -47,6 +50,18 @@ int main(int argc, char *argv[]) {
     printf("%4d %3d%1c %20.15f %20.15f\n", reqit[n][l], n, speclett(l), 
         Esolve, Eexact); 
   }
+}
+
+
+TEST(AtomicSolver, SphericalHarmonicOscillator) {
+
+  atom_t atom;
+  int n, l, reqit[10][10];
+
+  // fill an initial set of energy levels
+  atom.Z = 100;
+  atom.set_logarithmic_grid(10000, 0.0001, 200.0);
+  atom.fill_madelung_orbitals();
 
   // solve for harmonic oscillator
   atom.fill_harmonic_oscillator(2.0);
@@ -66,8 +81,14 @@ int main(int argc, char *argv[]) {
     dble Eexact = (1.5+2.*(n-1-l)+l)*2.0;
     printf("%4d %3d%1c %20.15f %20.15f\n", reqit[n][l], n, speclett(l), 
         Esolve, Eexact); 
-  }
- 
+  } 
+}
+
+TEST(AtomicSolver, SphericalSquareWell) {
+
+  atom_t atom;
+  int n, l, reqit[10][10];
+
   // solve for finite square well
   // set r[8121] = 2.5 exactly
   // note: you can then fix the match point to R = 2.5 exactly
@@ -112,5 +133,6 @@ int main(int argc, char *argv[]) {
         printf("%4d %3d%1c %20.15f %20s\n", 
             reqit[n][l], n, speclett(l), Esolve, "no solution");
   } 
-
 }
+
+} // namespace
